@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watch Your Speech: Text-aware Video-to-Speech Synthesis with Lip-Reading Guidance</title>
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+
+<header>
+  <!-- <a class="home-link" href="/" title="Home"><span>🏠</span></a> -->
+  <h1>Watch Your Speech: Text-aware Video-to-Speech Synthesis with Lip-Reading Guidance</h1>
+  
+  <p class="authors">Anonymous submission </p>
+  
+  <!-- <div class="pill-links">
+    <a class="pill" href="#"><svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"></path></svg> arXiv</a>
+    <a class="pill" href="#">💻 Code</a>
+  </div> -->
+</header>
+
+<!-- Figures Row -->
+<section class="figures">
+  <img src="Figure/architecture_1.png" alt="Overall Architecture">
+</section>
+
+<!-- Abstract -->
+<section class="abstract">
+  <h2>Abstract</h2>
+  <p>
+    Video-to-speech synthesis aims to generate natural-sounding speech from silent talking-face videos while ensuring the accurate content of the spoken sentences. Although significant progress has been made, concurrently achieving high sentence-level accuracy and excellent speech quality remains a major challenge. This difficulty stems from the inherent one-to-many mapping problem, where a single silent video can correspond to multiple valid phonetic expressions. To address this, this paper proposes a novel text-aware video-to-speech synthesis framework that leverages lip-reading guidance to convert the task into a well-defined one-to-one mapping. The proposed framework features an embedding fusion module that effectively preserves textual context and synchronizes it with video sequences during speech synthesis. Evaluations on the large-scale LRS2 and LRS3 datasets demonstrate that the proposed method significantly outperforms existing approaches. Specifically, the model achieves a new state-of-the-art in textual accuracy with a substantial reduction in word error rate, demonstrates highly competitive performance on other quantitative metrics, and receives superior scores in human-evaluated mean opinion scores for speech quality.
+  </p>
+</section>
+
+<!-- Comparison Table -->
+<section class="comparison">
+  <h2>Comparison results on LRS3 dataset</h2>
+  <table class="video-table">
+    <thead>
+      <tr>
+        <th>Silent video</th><th>Ground Truth</th><th>VCA-GAN [1]</th><th>SVTS [2]</th><th>DiffV2S [3]</th><th>IntelligibleL2S [4]</th><th>LipVoicer [5]</th><th>V2SFlow-A [6]</th><th>V2SFlow-V [6]</th><th>Proposed</th><th>Text</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Row 1 -->
+      <tr>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\Silent\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\GT\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\VCA-GAN\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\SVTS\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\DiffV2S\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\IntelligibleL2S\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\LipVoicer\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\V2SFlow-A\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\V2SFlow-V\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\AO4In7d6XSc_00003\Proposed\00003.mp4" controls></video></td>
+        <td class="transcript"><b>I love building robots</b></td>
+      </tr>
+
+      <tr>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\Silent\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\GT\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\VCA-GAN\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\SVTS\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\DiffV2S\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\IntelligibleL2S\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\LipVoicer\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\V2SFlow\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\V2SFlow-V\00006.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\27lMmdmySb8_00006\Proposed\00006.mp4" controls></video></td>
+        <td class="transcript"><b>We can't see it most of the time</b></td>
+      </tr>
+
+      <tr>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\Silent\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\GT\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\VCA-GAN\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\SVTS\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\DiffV2S\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\IntelligibleL2S\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\LipVoicer\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\V2SFlow\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\V2SFlow-V\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\2UStOghblfE_00002\Proposed\00002.mp4" controls></video></td>
+        <td class="transcript"><b>I mean how do they form</b></td>
+      </tr>
+
+   
+      <tr>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\Silent\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\GT\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\VCA-GAN\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\SVTS\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\DiffV2S\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\IntelligibleL2S\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\LipVoicer\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\V2SFlow-A\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\V2SFlow-V\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\BHY0FxzoKZE_00002\Proposed\00002.mp4" controls></video></td>
+        <td class="transcript"><b>I tried everything</b></td>
+      </tr>
+
+      </tr>
+
+    
+      <tr>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\Silent\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\GT\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\VCA-GAN\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\SVTS\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\DiffV2S\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\IntelligibleL2S\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\LipVoicer\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\V2SFlow\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\V2SFlow-V\00002.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\9TPFLHvn024_00002\Proposed\00002.mp4" controls></video></td>
+        <td class="transcript"><b>There were no back doors</b></td>
+      </tr>
+
+      </tr>
+
+
+
+
+
+      <tr>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\Silent\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\GT\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\VCA-GAN\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\SVTS\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\DiffV2S\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\IntelligibleL2S\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\LipVoicer\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\V2SFlow\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\V2SFlow-V\00003.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS3\d6NKdnZvdoo_00003\Proposed\00003.mp4" controls></video></td>
+        <td class="transcript"><b>But it's a global phenomenon</b></td>
+      </tr>
+
+
+    </tbody>
+  </table>
+
+  <hr class="table-divider">
+  
+  <h2>Comparison results on LRS2 dataset</h2>
+  <table class="video-table">
+    <thead>
+      <tr>
+        <th>Silent video</th><th>Ground Truth</th><th>VCA-GAN [1]</th><th>DiffV2S [3]</th><th>IntelligibleL2S [4]</th><th>LipVoicer [5]</th><th>V2SFlow-A [6]</th><th>V2SFlow-V [6]</th><th>Proposed</th><th>Text</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Row 1 -->
+
+
+      <tr>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\Silent\00018.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\GT\00018.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\VCA-GAN\00018.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\DiffV2S\00018.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\intelligibleL2S\00018.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\LipVoicer\00018.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\V2SFlow\00018.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\V2SFlow-V\00018.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6332062124509813446_00018\Proposed\00018.mp4" controls></video></td>
+        <td class="transcript"><b>It would have been Completely alien to the rest of london</b></td>
+      </tr>
+      <tr>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\Silent\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\GT\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\VCA-GAN\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\DiffV2S\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\intelligibleL2S\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\LipVoicer\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\V2SFlow\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\V2SFlow-V\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6358830508182123252_00029\Proposed\00029.mp4" controls></video></td>
+        <td class="transcript"><b>So to do ballroom</b></td>
+      </tr>
+
+      <tr>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\Silent\00022.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\GT\00022.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\VCA-GAN\00022.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\DiffV2S\00022.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\intelligibleL2S\00022.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\LipVoicer\00022.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\V2SFlow\00022.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\V2SFlow-V\00022.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6330311066473698535_00022\Proposed\00022.mp4" controls></video></td>
+        <td class="transcript"><b>And we were right</b></td>
+      </tr>
+
+      <tr>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\Silent\00138.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\GT\00138.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\VCA-GAN\00138.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\DiffV2S\00138.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\intelligibleL2S\00138.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\LipVoicer\00138.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\V2SFlow\00138.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\V2SFlow-V\00138.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6362913733590438579_00138\Proposed\00138.mp4" controls></video></td>
+        <td class="transcript"><b>Some burn brightly for a year or two</b></td>
+      </tr>
+
+      <tr>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\Silent\00027.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\GT\00027.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\VCA-GAN\00027.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\DiffV2S\00027.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\intelligibleL2S\00027.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\LipVoicer\00027.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\V2SFlow\00027.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\V2SFlow-V\00027.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6356603997135874072_00027\Proposed\00027.mp4" controls></video></td>
+        <td class="transcript"><b>That is a first</b></td>
+      </tr>
+
+
+
+
+
+
+      <tr>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\Silent\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\GT\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\VCA-GAN\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\DiffV2S\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\intelligibleL2S\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\LipVoicer\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\V2SFlow\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\V2SFlow-V\00029.mp4" controls></video></td>
+        <td><video src="MOS_sample_codec\LRS2\6331559613336179781_00029\Proposed\00029.mp4" controls></video></td>
+        <td class="transcript"><b>Something like a garden compost</b></td>
+      </tr>
+
+      <!-- Additional rows ... -->
+    </tbody>
+  </table>
+</section>
+
+<section class="references">
+  <p>
+    [1] VCA-GAN: <a href="https://arxiv.org/abs/2204.01726">Lip to Speech Synthesis with Visual Context Attentional GAN</a><br>
+    [2] SVTS: <a href="https://arxiv.org/abs/2205.02058">SVTS: Scalable Video-to-Speech Synthesis</a><br>
+    [3] DiffV2S: <a href="https://arxiv.org/abs/2308.07787">DiffV2S: Diffusion-based Video-to-Speech Synthesis with Vision-guided Speaker Embedding</a><br>
+    [4] IntelligibleL2S: <a href="https://arxiv.org/abs/2305.19603">Intelligible Lip-to-Speech Synthesis with Speech Units</a><br>
+    [5] LipVoicer: <a href="https://arxiv.org/abs/2306.03258">LipVoicer: Generating Speech from Silent Videos Guided by Lip Reading</a><br>
+    [6] V2SFlow: <a href="https://arxiv.org/abs/2303.13993">V2SFlow: Video-to-Speech Generation with Speech Decomposition and Rectified Flow</a><br>
+  </p>
+
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+:root {
+    --bg: #fafafa;
+    --text: #111827;
+    --primary: #1f2937;
+    --accent: #2563eb;
+    --card: #ffffff;
+    --shadow: rgba(0, 0, 0, 0.06);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    word-break: keep-all;
+}
+
+a {
+    color: var(--accent);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* ----- Header & Title ----- */
+header {
+    text-align: center;
+    padding: 2rem 1rem 0;
+    margin-bottom: 5%;
+}
+
+.home-link {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.home-link span {
+    display: inline-block;
+    transform: translateY(2px);
+}
+
+h1 {
+    margin: 0.5rem 0 0;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 800;
+}
+
+.authors {
+    margin: 0.5rem 0 0.75rem;
+    font-size: 1.8rem;
+}
+
+.affiliation {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+.pill-links {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin: 0.75rem 0 1.5rem;
+    flex-wrap: wrap;
+}
+
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--primary);
+    color: #fff;
+    padding: 0.45rem 0.9rem;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.pill svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ----- Figures Row ----- */
+.figures {
+    max-width: 1500px;
+    margin: 0 auto 5%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.25rem;
+
+}
+
+.figures img {
+    max-width: 1500px;
+    width: 100%;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 12px var(--shadow);
+}
+
+/* ----- Abstract ----- */
+.abstract {
+    max-width: 850px;
+    margin: 0 auto 3.5rem;
+    padding: 0 1rem;
+}
+
+.abstract h2 {
+    text-align: center;
+    font-size: 2.0rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+}
+
+.abstract p {
+    margin: 0;
+    text-align: justify;
+    font-size: 1.2rem;
+}
+
+/* ----- Comparison Table ----- */
+.comparison {
+    /* max-width: 1300px; */
+    margin: 0 auto 4rem;
+    padding: 0 0.5rem;
+    display: grid;
+    place-content: center;
+
+}
+
+.comparison h2 {
+    text-align: center;
+    font-size: 2.0rem;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    }
+
+.video-table {
+    
+    border-collapse: separate;
+    border-spacing: 0.75rem 0.85rem;
+}
+
+.video-table thead th {
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 0.25rem 0.4rem;
+}
+
+.video-table tbody td {
+    text-align: center;
+    vertical-align: top;
+}
+
+.video-table video {
+    width: 120px;
+    height: 120px;
+    border-radius: 0.5rem;
+    background: #000;
+}
+
+.transcript {
+    width: 100px;
+    text-align: left;
+    font-size: 0.775rem; 
+}
+.table-divider {
+border: none;
+height: 2px;
+background-color: #999;
+margin: 10px 0 40px 0;  /* 위 60px, 아래 40px 여백 */
+}
+.references {
+    max-width: 1300px;
+    margin: 0 auto 4rem;
+    padding: 0 0.5rem;
+    display: grid;
+    place-content: auto;
+
+}
+
+/* ------ Footer ------ */
+footer {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #6b7280;
+    padding: 2rem 1rem 2.5rem;
+}
