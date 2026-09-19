@@ -182,14 +182,20 @@ def generate(
         audio = audio.squeeze()
         audio = audio / 1.1 / audio.abs().max()
         audio = audio.cpu().numpy()
+        ground_truth_audio = gt_audio.squeeze().cpu().numpy()
         sf.write(os.path.join(_output_directory, video_id + '.wav'), audio, 16000)
-        sf.write(os.path.join(_output_directory, video_id + '_gt.wav'), audio, 16000)
+        sf.write(os.path.join(_output_directory, video_id + '_gt.wav'), ground_truth_audio, 16000)
         # attach audio to video
         in_video_filename = os.path.join(dataset_cfg.dataset_root, 'test', video_id+".mp4")
-        subprocess.call(f"ffmpeg -y -i {in_video_filename} \
-                    -i {os.path.join(_output_directory, video_id + '.wav')} \
-                    -c:v copy -map 0:v:0 -map 1:a:0 \
-                    {os.path.join(_output_directory, video_id + '.mp4')}", shell=True)
+        subprocess.run(
+            [
+                "ffmpeg", "-y", "-i", in_video_filename,
+                "-i", os.path.join(_output_directory, video_id + '.wav'),
+                "-c:v", "copy", "-map", "0:v:0", "-map", "1:a:0",
+                os.path.join(_output_directory, video_id + '.mp4'),
+            ],
+            check=True,
+        )
 
         # save as file
         melspec = melspec.squeeze(0).cpu()

@@ -9,8 +9,10 @@ from functools import partial
 def extract_audio(v, out_dir, ds_dir):
     outfile = v.replace(ds_dir, out_dir).replace(".mp4", ".wav")
     os.makedirs(os.path.dirname(outfile), exist_ok=True)
-    cmd = f"ffmpeg -loglevel error -y -i {v} -map 0:a {outfile}"
-    os.system(cmd)
+    subprocess.run(
+        ["ffmpeg", "-loglevel", "error", "-y", "-i", v, "-map", "0:a", outfile],
+        check=True,
+    )
 
 
 def main(args):

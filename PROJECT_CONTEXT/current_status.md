@@ -21,5 +21,6 @@ machine-local path rejection, and forbidden artifact rejection.
 - WYS, HiFi-GAN, and single-video lip-reading weights are not distributed.
 - LRS2/LRS3 data must be obtained and preprocessed by the user under the
   datasets' terms.
-- Dependency pins reproduce the original research stack and may require a
+- Legacy dependency pins reflect the original research stack; the added WYS
+  text-model and tooling packages are unpinned and may require a compatible
   CUDA-specific PyTorch installation.

@@ -9,8 +9,7 @@ import os
 import glob
 import pickle
 import numpy as np
-# from pipelines.detectors.mediapipe.detector import LandmarksDetector
-from pipelines.data.data_module import AVSRDataLoader
+from mouthroi_processing.pipelines.data.data_module import AVSRDataLoader
 from tqdm import tqdm
 from pathos.multiprocessing import ProcessingPool as Pool
 from functools import partial

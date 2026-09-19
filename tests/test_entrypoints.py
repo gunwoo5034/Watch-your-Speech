@@ -57,3 +57,32 @@ def test_mel_generation_main_passes_only_supported_generate_options():
     assert "**cfg.generate" not in source
     assert "n_samples=cfg.generate.n_samples" in source
     assert "w_video=cfg.generate.w_video" in source
+
+
+def test_public_media_commands_do_not_invoke_a_shell():
+    paths = ENTRYPOINTS + [
+        ROOT / "dataloaders/extract_audio_from_video.py",
+        ROOT / "mouthroi_processing/crop_and_infer.py",
+    ]
+    for path in paths:
+        source = path.read_text(encoding="utf-8")
+        assert "shell=True" not in source, path.name
+        assert "os.system(" not in source, path.name
+
+
+def test_real_video_frame_selection_stays_in_bounds():
+    source = (ROOT / "inference_real_video.py").read_text(encoding="utf-8")
+    assert "random.randint(0, face_crop_160.shape[0])" not in source
+    assert "random.randrange(face_crop_160.shape[0])" in source
+
+
+def test_full_split_writes_actual_ground_truth_audio():
+    source = (ROOT / "inference_full_test_split.py").read_text(encoding="utf-8")
+    assert "ground_truth_audio = gt_audio.squeeze().cpu().numpy()" in source
+    assert "video_id + '_gt.wav'), ground_truth_audio" in source
+
+
+def test_mouth_crop_helper_uses_package_imports():
+    source = (ROOT / "dataloaders/extract_moutcrops.py").read_text(encoding="utf-8")
+    assert "from pipelines." not in source
+    assert "from mouthroi_processing.pipelines." in source

@@ -62,3 +62,8 @@ def test_obsolete_identity_is_not_used_for_wys_modules():
         if "lipvoicer" in text:
             offenders.append(str(relative))
     assert offenders == []
+
+
+def test_preprocessing_runtime_dependency_is_declared():
+    requirements = (ROOT / "requirements.txt").read_text(encoding="utf-8").splitlines()
+    assert "pathos" in requirements

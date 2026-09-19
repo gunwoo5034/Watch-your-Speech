@@ -173,7 +173,7 @@ def generate(
     mouthroi = mouthroi.unsqueeze(0).unsqueeze(0)
 
     face_image_transform = get_face_image_transform()
-    index = random.randint(0, face_crop_160.shape[0])
+    index = random.randrange(face_crop_160.shape[0])
     face_image = face_crop_160[index]
     # face_image = load_frame(video_filename)
     face_image = Image.fromarray(face_image)
@@ -226,10 +226,15 @@ def generate(
     sf.write(os.path.join(output_directory, video_name + '.wav'), audio, 16000) #save generated wave
 
     # attach audio to video
-    subprocess.call(f"ffmpeg -y -i {video_filename} \
-                -i {os.path.join(output_directory, video_name + '.wav')} \
-                -c:v copy -map 0:v:0 -map 1:a:0 \
-                {os.path.join(output_directory, video_name + '.mp4')}", shell=True) #기존 비디오에 생성된 오디오 넣음
+    subprocess.run(
+        [
+            "ffmpeg", "-y", "-i", video_filename,
+            "-i", os.path.join(output_directory, video_name + '.wav'),
+            "-c:v", "copy", "-map", "0:v:0", "-map", "1:a:0",
+            os.path.join(output_directory, video_name + '.mp4'),
+        ],
+        check=True,
+    )
 
     return
 

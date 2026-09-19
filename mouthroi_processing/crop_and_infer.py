@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import torch
 import torchvision
+from pathlib import Path
 from .pipelines.pipeline import InferencePipeline
 
 
@@ -34,10 +35,17 @@ def main(video_filename, output_directory):
     # Verify that the videos sample rate is 25Hz
     fps = cv2.VideoCapture(video_filename).get(cv2.CAP_PROP_FPS)
     if fps != 25:
-        video_filename25 = video_filename.replace(".mp4", "25fps.mp4")
+        source = Path(video_filename)
+        video_filename25 = Path(output_directory) / f"{source.stem}_25fps.mp4"
         print("Converting fps to 25Hz")
-        os.system(f"ffmpeg -y -i {video_filename} -filter:v fps=fps=25 {video_filename25}")
-        os.system(f"mv {video_filename25} {video_filename}")
+        subprocess.run(
+            [
+                "ffmpeg", "-y", "-i", str(source),
+                "-filter:v", "fps=fps=25", str(video_filename25),
+            ],
+            check=True,
+        )
+        video_filename = str(video_filename25)
 
     print("Cropping mouth region")
     detector = "retinaface"
