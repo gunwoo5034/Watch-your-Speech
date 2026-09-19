@@ -12,6 +12,7 @@ from .face_model import Resnet18
 from .lipreading_models.lipreading_model import Lipreading
 import os
 import sys
+from pathlib import Path
 # sys.path.insert(0, '..')
 from .utils import load_json
 from .wavenet import WaveNet
@@ -28,7 +29,7 @@ class ModelBuilder():
 
     #builder for lipreading stream
     def build_lipreadingnet(self):
-        config_path = 'models/lipreading_models/lrw_snv1x_tcn2x.json'
+        config_path = Path(__file__).resolve().parent / 'lipreading_models' / 'lrw_snv1x_tcn2x.json'
         assert os.path.exists(config_path)
         args_loaded = load_json(config_path)
         print('Lipreading configuration file loaded.')

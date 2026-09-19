@@ -160,21 +160,3 @@ def load_json( json_fp ):
     with open( json_fp, 'r' ) as f:
         json_content = json.load(f)
     return json_content
-if __name__=="__main__":
-    config_path = '/home/gunwoo/gunwoo/LipVoicer/models/lipreading_models/lrw_snv1x_tcn2x.json'
-    args_loaded = load_json(config_path)
-    tcn_options = { 'num_layers': args_loaded['tcn_num_layers'],
-                        'kernel_size': args_loaded['tcn_kernel_size'],
-                        'dropout': args_loaded['tcn_dropout'],
-                        'dwpw': args_loaded['tcn_dwpw'],
-                        'width_mult': args_loaded['tcn_width_mult']}
-    net = Lipreading(tcn_options=tcn_options,
-                    backbone_type=args_loaded['backbone_type'],
-                    relu_type=args_loaded['relu_type'],
-                    width_mult=args_loaded['width_mult'],
-                    extract_feats=True)
-
-    x = torch.Tensor(np.random.rand(8,1,25,88,88))
-
-    y = net(x)
-    print(y)

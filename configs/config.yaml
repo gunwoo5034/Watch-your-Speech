@@ -72,8 +72,6 @@ generate:
   n_samples: 3
   video_path: null
   w_video: 2.0
-  w_asr: 0.5
-  asr_start: 230
   save_dir: outputs
   lipread_text_dir: null
 

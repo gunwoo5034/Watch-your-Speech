@@ -19,13 +19,13 @@ from omegaconf import DictConfig, OmegaConf
 from tqdm import tqdm
 from models.model_builder import ModelBuilder
 from models.audiovisual_model import AudioVisualModel
-from dataloaders.dataset_lipvoicer import LipVoicerDataset
+from dataloaders.dataset_wys import WYSDataset
 from dataloaders.stft import denormalise_mel
 
 from utils import find_max_epoch, print_size, calc_diffusion_hyperparams, local_directory
 
 def sampling(net, diffusion_hyperparams, w_video, condition=None):
-    """
+    r"""
     Perform the complete sampling step according to p(x_0|x_T) = \prod_{t=1}^T p_{\theta}(x_{t-1}|x_t)
 
     Parameters:
@@ -125,7 +125,7 @@ def generate(
     except:
         raise Exception('No valid model found')
 
-    dataset = LipVoicerDataset('test', **dataset_cfg)
+    dataset = WYSDataset('test', **dataset_cfg)
     dataset_indices = torch.arange(n_samples)
     groundtruth_melspec, mouthroi, face_image ,text= [], [], [] ,[]
     for i in dataset_indices:
@@ -169,12 +169,18 @@ def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
     OmegaConf.set_struct(cfg, False)  # Allow writing keys
 
-    generate(0,
-        name=cfg.generate['name'],
+    generate(
+        cfg.rank,
+        name=cfg.generate.name,
         diffusion_cfg=cfg.diffusion,
-        model_cfg=cfg.model,
+        model_cfg=cfg.melgen,
         dataset_cfg=cfg.dataset,
-        **cfg.generate,
+        text_cfg=cfg.text,
+        attention_cfg=cfg.attention,
+        save_dir=cfg.train.save_dir,
+        ckpt_iter=cfg.train.ckpt_iter,
+        n_samples=cfg.generate.n_samples,
+        w_video=cfg.generate.w_video,
     )
 
 

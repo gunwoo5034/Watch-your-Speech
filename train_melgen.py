@@ -32,8 +32,6 @@ from inference_melgen import generate
 from models.model_builder import ModelBuilder
 from models.audiovisual_model import AudioVisualModel
 
-#wandb.init(project='Lipvoicer')
-
 def init_ema(model: torch.nn.Module) -> torch.nn.Module:
     ema_model = deepcopy(model).eval()        # EMA는 평가 모드로 유지
     for p in ema_model.parameters():
@@ -110,7 +108,7 @@ def train(
 
     if rank == 0:
         writer = SummaryWriter(log_dir='logs')
-        wandb.init(project="Lipvoicer")  # 이름과 프로젝트 설정
+        wandb.init(project="Watch-Your-Speech")
         wandb.config.update({
             "learning_rate": learning_rate,
             "batch_size": batch_size_per_gpu * num_gpus,

@@ -3,11 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import math
-import numpy as np
 import random
-
-from omegaconf import DictConfig, OmegaConf
-import hydra
 class InputEmbeddings(nn.Module):
     def __init__(self,d_model : int, vocab_size : int):
         super(InputEmbeddings,self).__init__()
@@ -388,20 +384,3 @@ class MultiConditionFusion(nn.Module):
         combined = torch.cat((w_video,w_text,w_vt), dim = -1) # dim은 다시보기
         combined = combined.permute(0,2,1).unsqueeze(2)
         return combined
-
-@hydra.main(version_base=None, config_path="/home/gunwoo/gunwoo/LipVoicer_attention_test/configs/", config_name="config")
-def main(cfg: DictConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
-    OmegaConf.set_struct(cfg, False)
-    model = MultiAttentionEncoder(**cfg.attention)
-    fusionmodel = MultiConditionFusion(input_ch = 256)
-    #model = MouthLandmark_Model(mouth_cfg= cfg.mouthlandmark)
-    video_emb = torch.Tensor(np.random.rand(128, 256, 1, 25))
-    text_emb  = torch.Tensor(np.random.rand(128, 256, 25))
-    video_att, text_att, vt_att = model(video_emb, text_emb)
-    y = fusionmodel(video_att , text_att, vt_att)
-    print(y.shape)
-    print(y)
-
-if __name__ == "__main__":
-    main()

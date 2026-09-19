@@ -56,8 +56,7 @@ def main(cfg):
 
     stft = STFT(**cfg.audio)
 
-    # filepaths = get_all_filenames(cfg.dataset["audio_dir"])
-    filepaths = get_all_filenames("/home/gunwoo/gunwoo/MOS_sample/lipreading_6336739343895160063_00052")
+    filepaths = get_all_filenames(cfg.dataset.audios_dir)
     filepaths = sorted(filepaths)
 
     max_val = 0

@@ -25,8 +25,6 @@ from omegaconf import DictConfig, OmegaConf
 from tqdm import tqdm
 from models.model_builder import ModelBuilder
 from models.audiovisual_model import AudioVisualModel
-import ASR.asr_models as asr_models
-from dataloaders.dataset_lipvoicer import LipVoicerDataset
 from dataloaders.stft import denormalise_mel
 import torchvision.transforms as transforms
 from dataloaders.lipreading_utils import *
@@ -72,16 +70,8 @@ def load_frame(clip_path):
         return frame
 
 
-def sampling(net, diffusion_hyperparams,
-            w_video, condition=None,
-            asr_guidance_net=None,
-            w_asr=None,
-            asr_start=None,
-            guidance_text=None,
-            tokenizer=None,
-            decoder=None
-            ):
-    """
+def sampling(net, seed, diffusion_hyperparams, w_video, condition, guidance_text):
+    r"""
     Perform the complete sampling step according to p(x_0|x_T) = \prod_{t=1}^T p_{\theta}(x_{t-1}|x_t)
 
     Parameters:
@@ -93,53 +83,32 @@ def sampling(net, diffusion_hyperparams,
     the generated melspec(s) in torch.tensor, shape=size
     """
 
-    _dh = diffusion_hyperparams
-    T, Alpha, Alpha_bar, Sigma = _dh["T"], _dh["Alpha"], _dh["Alpha_bar"], _dh["Sigma"]
-    assert len(Alpha) == T
-    assert len(Alpha_bar) == T
-    assert len(Sigma) == T
-
-    # tokenize textaaaaaaa
-    if asr_guidance_net is not None:
-        text_tokens = torch.LongTensor(tokenizer.encode(guidance_text))
-        text_tokens = text_tokens.unsqueeze(0).cuda()
-
     mouthroi, face_image = condition
-    sample_step = 100
-
-    timesteps = torch.linspace(1.0,0.0, sample_step+1)
-    eps0 = torch.randn(mouthroi.shape[0], 80, mouthroi.shape[2]*4, device='cuda')
-    x = eps0.clone().cuda()
-    length_input = x.shape[2]
+    sample_step = diffusion_hyperparams["T"]
+    timesteps = torch.linspace(1.0, 0.0, sample_step + 1)
+    torch.manual_seed(seed)
+    eps0 = torch.randn(mouthroi.shape[0], 80, mouthroi.shape[2] * 4, device="cuda")
+    x = eps0.clone()
     with torch.no_grad():
-        for i in tqdm(range(sample_step)):
-            t = timesteps[i]
-            t_next = timesteps[i+1]
-            dt = t - t_next
-            diffusion_steps = (t * torch.ones((x.shape[0], 1))).cuda()  # use the corresponding reverse step
-            v_pred_con    = net.sample(x, eps0, mouthroi, face_image, guidance_text, diffusion_steps, cond_drop_prob=0)   # predict \epsilon according to \epsilon_\theta
-            v_pred_uncond = net.sample(x, eps0, mouthroi, face_image, guidance_text, diffusion_steps, cond_drop_prob=1)
-
-            v_pred = v_pred_uncond + w_video * (v_pred_con - v_pred_uncond)
-
-            x = x - v_pred * dt
-
-
-            if t % 10 == 0:
-                if asr_guidance_net is not None and t <= asr_start:
-                    inputs = x, length_input
-                    outputs_ao = asr_guidance_net(inputs, diffusion_steps)["outputs"]
-                    preds_ao = decoder(outputs_ao)[0]
-                    print("pred:"  ,preds_ao, '\n')
-                    print("target:",guidance_text, '\n')
-
+        for index in tqdm(range(sample_step)):
+            timestep = timesteps[index]
+            dt = timestep - timesteps[index + 1]
+            steps = timestep * torch.ones((x.shape[0], 1), device=x.device)
+            conditional = net.sample(
+                x, eps0, mouthroi, face_image, guidance_text, steps, cond_drop_prob=0
+            )
+            unconditional = net.sample(
+                x, eps0, mouthroi, face_image, guidance_text, steps, cond_drop_prob=1
+            )
+            x = x - ((1 + w_video) * conditional - w_video * unconditional) * dt
 
     return x
 
 
 @torch.no_grad()
 def generate(
-        ckpt_num,
+        rank,
+        seed,
         generate_cfg,
         diffusion_cfg,
         model_cfg,
@@ -148,7 +117,7 @@ def generate(
         **kwargs
     ):
 
-    torch.cuda.set_device(1)
+    torch.cuda.set_device(rank)
 
     # map diffusion hyperparameters to gpu
     diffusion_hyperparams  = calc_diffusion_hyperparams(**diffusion_cfg, fast=True)  # dictionary of all diffusion hyperparameters
@@ -177,7 +146,7 @@ def generate(
         raise Exception('No valid model found')
 
     video_filename = generate_cfg['video_path']
-    output_directory = f"{video_filename.split('/')[-2]}_{video_filename.split('/')[-1].replace('.mp4', '')}/{ckpt_num}"
+    output_directory = Path(video_filename).stem
     if generate_cfg['save_dir']:
         save_dir = generate_cfg['save_dir']
     else:
@@ -188,14 +157,8 @@ def generate(
         os.chmod(output_directory, 0o775)
     print("saving to output directory", output_directory)
 
-    print('Loading ASR, tokenizer and decoder')
-    asr_guidance_net, tokenizer, decoder = asr_models.get_models('LRS2')
-
     w_video = generate_cfg['w_video']
-    w_asr = generate_cfg['w_asr']
-    asr_start = generate_cfg['asr_start']
     guidance_dir_name = f"w1={w_video}"
-    guidance_dir_name += f"_w2={w_asr}_asr_start={asr_start}"
     output_directory = os.path.join(output_directory, guidance_dir_name)
     os.makedirs(output_directory, exist_ok=True)
     print("saving to output directory", output_directory)
@@ -223,17 +186,14 @@ def generate(
     start.record()
 
     print('Generating melspectrogram')
-    melspec = sampling(net,
-                    diffusion_hyperparams,
-                    w_video,
-                    condition=(mouthroi.cuda(), face_image.cuda()),
-                    asr_guidance_net=asr_guidance_net,
-                    w_asr=w_asr,
-                    asr_start=asr_start,
-                    guidance_text=text,
-                    tokenizer=tokenizer,
-                    decoder=decoder
-                    )
+    melspec = sampling(
+        net,
+        seed,
+        diffusion_hyperparams,
+        w_video,
+        condition=(mouthroi.cuda(), face_image.cuda()),
+        guidance_text=text,
+    )
     melspec = denormalise_mel(melspec)
     end.record()
     torch.cuda.synchronize()
@@ -274,21 +234,19 @@ def generate(
     return
 
 
-@hydra.main(version_base=None, config_path="configs/", config_name="config_test")
+@hydra.main(version_base=None, config_path="configs/", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
     OmegaConf.set_struct(cfg, False)  # Allow writing keys
 
-    #ckpt_lst = os.listdir(f"/home/gunwoo/gunwoo/LipVoicer_Origin/exp/LRS2/wnet_h512_d12_T400_betaT0.02/checkpoint")
-    # for ckpt_num in ckpt_lst:
-
     generate(
-            "0",
-            generate_cfg=cfg.generate,
-            diffusion_cfg=cfg.diffusion,
-            model_cfg=cfg.melgen,
-            text_cfg = cfg.text,
-            attention_cfg = cfg.attention
+        cfg.rank,
+        cfg.seed,
+        generate_cfg=cfg.generate,
+        diffusion_cfg=cfg.diffusion,
+        model_cfg=cfg.melgen,
+        text_cfg=cfg.text,
+        attention_cfg=cfg.attention,
     )
 
 if __name__ == "__main__":

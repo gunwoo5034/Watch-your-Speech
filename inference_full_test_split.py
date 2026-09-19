@@ -22,8 +22,7 @@ from omegaconf import DictConfig, OmegaConf
 from tqdm import tqdm
 from models.model_builder import ModelBuilder
 from models.audiovisual_model import AudioVisualModel
-import ASR.asr_models as asr_models
-from dataloaders.dataset_lipvoicer import LipVoicerDataset
+from dataloaders.dataset_wys import WYSDataset
 from dataloaders.stft import denormalise_mel
 from hifi_gan.generator import Generator as Vocoder
 from hifi_gan import utils as vocoder_utils
@@ -32,16 +31,8 @@ from hifi_gan.env import AttrDict
 from utils import find_max_epoch, print_size, calc_diffusion_hyperparams, local_directory
 
 
-def sampling(net, seed, diffusion_hyperparams,
-            w_video, condition=None,
-            asr_guidance_net=None,
-            w_asr=None,
-            asr_start=None,
-            guidance_text=None,
-            tokenizer=None,
-            decoder=None
-            ):
-    """
+def sampling(net, seed, diffusion_hyperparams, w_video, condition, guidance_text):
+    r"""
     Perform the complete sampling step according to p(x_0|x_T) = \prod_{t=1}^T p_{\theta}(x_{t-1}|x_t)
 
     Parameters:
@@ -53,40 +44,24 @@ def sampling(net, seed, diffusion_hyperparams,
     the generated melspec(s) in torch.tensor, shape=size
     """
 
-    _dh = diffusion_hyperparams
-    T, Alpha, Alpha_bar, Sigma = _dh["T"], _dh["Alpha"], _dh["Alpha_bar"], _dh["Sigma"]
-    assert len(Alpha) == T
-    assert len(Alpha_bar) == T
-    assert len(Sigma) == T
-
-    # tokenize textaaaaaaa
-    if asr_guidance_net is not None:
-        text_tokens = torch.LongTensor(tokenizer.encode(guidance_text))
-        text_tokens = text_tokens.unsqueeze(0).cuda()
-
     mouthroi, face_image = condition
-    sample_step = T
-    timesteps = torch.linspace(1.0,0.0, sample_step+1)
+    sample_step = diffusion_hyperparams["T"]
+    timesteps = torch.linspace(1.0, 0.0, sample_step + 1)
     torch.manual_seed(seed)
-    eps0 = torch.randn(mouthroi.shape[0], 80, mouthroi.shape[2]*4, device='cuda')
-    x = eps0.clone().cuda()
+    eps0 = torch.randn(mouthroi.shape[0], 80, mouthroi.shape[2] * 4, device="cuda")
+    x = eps0.clone()
     with torch.no_grad():
-        for i in range(sample_step):
-            t = timesteps[i]
-            t_next = timesteps[i+1]
-            dt = t - t_next
-            diffusion_steps = (t * torch.ones((x.shape[0], 1))).cuda()  # use the corresponding reverse step
-            # if i == 0:
-            #     noise = z.clone()
-            # else:
-            #     noise = (z - (1 - diffusion_steps) * (v_pred + noise))
-
-            v_pred_con    = net.sample(x, eps0, mouthroi, face_image, guidance_text, diffusion_steps, cond_drop_prob=0)   # predict \epsilon according to \epsilon_\theta
-            v_pred_uncond = net.sample(x, eps0, mouthroi, face_image, guidance_text, diffusion_steps, cond_drop_prob=1)
-
-            # v_pred = v_pred_uncond + w_video * (v_pred_con - v_pred_uncond)
-            v_pred = (1+ w_video) * v_pred_con - w_video * v_pred_uncond
-            x = x - v_pred * dt
+        for index in range(sample_step):
+            timestep = timesteps[index]
+            dt = timestep - timesteps[index + 1]
+            steps = timestep * torch.ones((x.shape[0], 1), device=x.device)
+            conditional = net.sample(
+                x, eps0, mouthroi, face_image, guidance_text, steps, cond_drop_prob=0
+            )
+            unconditional = net.sample(
+                x, eps0, mouthroi, face_image, guidance_text, steps, cond_drop_prob=1
+            )
+            x = x - ((1 + w_video) * conditional - w_video * unconditional) * dt
 
     return x
 
@@ -102,8 +77,6 @@ def generate(
         attention_cfg,
         ckpt_path,
         w_video=0,
-        w_asr=1.1,
-        asr_start=250,
         save_dir=None,
         lipread_text_dir=None,
         **kwargs
@@ -147,13 +120,7 @@ def generate(
             os.chmod(output_directory, 0o775)
         print("saving to output directory", output_directory)
 
-    if 'LRS2' in dataset_cfg.videos_dir or 'lrs2' in dataset_cfg.videos_dir:
-        ds_name = 'LRS2'
-    else:
-        ds_name = 'LRS3'
-
-    print('Loading ASR, tokenizer and decoder')
-    asr_guidance_net, tokenizer, decoder = asr_models.get_models(ds_name)
+    ds_name = dataset_cfg.name.upper()
 
     # HiFi-GAN
     print('Load HiFi-GAN')
@@ -169,7 +136,7 @@ def generate(
     vocoder.eval()
     vocoder.remove_weight_norm()
 
-    dataset = LipVoicerDataset('test', **dataset_cfg)
+    dataset = WYSDataset('test', **dataset_cfg)
 
     guidance_dir_name = f'w1={w_video}'
     _output_directory = os.path.join(output_directory, ds_name,str(diffusion_hyperparams['T']) ,guidance_dir_name)
@@ -194,17 +161,14 @@ def generate(
         end = torch.cuda.Event(enable_timing=True)
         start.record()
 
-        melspec = sampling(net, seed,
-                        diffusion_hyperparams,
-                        w_video,
-                        condition=(mouthroi.cuda(), face_image.cuda()),
-                        asr_guidance_net=asr_guidance_net,
-                        w_asr=w_asr,
-                        asr_start=asr_start,
-                        guidance_text=text,
-                        tokenizer=tokenizer,
-                        decoder=decoder
-                        )
+        melspec = sampling(
+            net,
+            seed,
+            diffusion_hyperparams,
+            w_video,
+            condition=(mouthroi.cuda(), face_image.cuda()),
+            guidance_text=text,
+        )
         melspec = denormalise_mel(melspec)
         end.record()
         torch.cuda.synchronize()
@@ -247,7 +211,7 @@ def generate(
     return
 
 
-@hydra.main(version_base=None, config_path="configs/", config_name="config_test")
+@hydra.main(version_base=None, config_path="configs/", config_name="config")
 def main(cfg: DictConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
     OmegaConf.set_struct(cfg, False)  # Allow writing keys

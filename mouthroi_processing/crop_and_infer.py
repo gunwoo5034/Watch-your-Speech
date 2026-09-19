@@ -59,9 +59,3 @@ def main(video_filename, output_directory):
     with open(os.path.join(output_directory, "lipreading_prediction.txt"), 'w') as f:
         f.write(transcript)
     return mouth_crop, transcript, face_crop_160
-
-
-if __name__ == "__main__":
-    data_filename = "/workspace/inputs/yochai/lipvoicer/data/raw/LRS3/test/0Fi83BHQsMA/00002.mp4"
-    dst_filename = "./out.mp4"
-    main(data_filename, dst_filename)
