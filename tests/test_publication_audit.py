@@ -27,13 +27,14 @@ def publication_paths():
 def test_no_private_or_generated_artifacts_are_published():
     paths = publication_paths()
     assert not [path for path in paths if path.parts[0] in FORBIDDEN_TOP_LEVEL]
+    assert not [path for path in paths if path.parts[:2] == ("docs", "superpowers")]
     assert not [path for path in paths if path.suffix.lower() in FORBIDDEN_SUFFIXES]
 
 
 def test_no_machine_specific_paths_are_published():
     offenders = []
     for relative in publication_paths():
-        if relative.parts[0] in {"tests", "docs", "PROJECT_CONTEXT"}:
+        if relative.parts[0] == "tests":
             continue
         path = ROOT / relative
         if not path.is_file() or path.suffix.lower() in {".png", ".jpg", ".wav"}:
