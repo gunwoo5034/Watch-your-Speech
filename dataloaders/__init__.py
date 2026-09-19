@@ -5,11 +5,11 @@
 import torch
 from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader
-from .dataset_lipvoicer import LipVoicerDataset
+from .dataset_wys import WYSDataset
 
 def dataloader(dataset_cfg, batch_size, num_gpus):
 
-    dataset = LipVoicerDataset(split='train', **dataset_cfg)
+    dataset = WYSDataset(split='train', **dataset_cfg)
 
     # distributed sampler
     train_sampler = DistributedSampler(dataset) if num_gpus > 1 else None

@@ -1,0 +1,12 @@
+name: lrs3
+root: datasets/LRS3
+videos_dir: ${dataset.root}/videos
+mouthrois_dir: ${dataset.root}/mouth_rois
+audios_dir: ${dataset.root}/audios
+text_dir: ${dataset.root}/videos
+dataset_root: ${dataset.videos_dir}
+sampling_rate: ${audio.sampling_rate}
+videos_window_size: 25
+audio_stft_hop: ${audio.hop_length}
+pred_text_main_dir: null
+pred_text_pretrain_dir: null

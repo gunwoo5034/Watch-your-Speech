@@ -12,7 +12,7 @@ def test_core_entrypoints_are_published():
         "inference_real_video.py",
         "models/audiovisual_model.py",
         "models/transformer.py",
-        "dataloaders/dataset_lipvoicer.py",
+        "dataloaders/dataset_wys.py",
         "hifi_gan/generator.py",
         "mouthroi_processing/crop_and_infer.py",
     }

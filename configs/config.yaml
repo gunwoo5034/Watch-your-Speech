@@ -1,0 +1,82 @@
+defaults:
+  - dataset: lrs3
+  - _self_
+
+rank: 0
+seed: 42
+
+melgen:
+  _name_: melgen
+  in_channels: 80
+  out_channels: 80
+  diffusion_step_embed_dim_in: 128
+  diffusion_step_embed_dim_mid: 512
+  diffusion_step_embed_dim_out: 512
+  res_channels: 512
+  skip_channels: 512
+  num_res_layers: 12
+  dilation_cycle: 1
+  mel_upsample: [2, 2]
+
+text:
+  model_type: RNN
+  RNN:
+    input_dim: 40
+    hidden_dim: 256
+    layer_dim: 1
+    output_dim: 256
+    dropout: 0.5
+    fc_1: 100
+    fc_2: 25
+  CNN:
+    channel_1: 32
+    channel_2: 64
+    channel_3: 128
+    linear: 1024
+    num_class: 500
+    hidden_dim: 128
+    extract_feats: true
+
+attention:
+  video_length: 25
+  text_length: 30
+  d_model: 512
+
+diffusion:
+  T: 400
+  beta_0: 0.0001
+  beta_T: 0.02
+  beta: null
+
+audio:
+  sampling_rate: 16000
+  filter_length: 640
+  hop_length: 160
+  win_length: 640
+  mel_fmin: 20.0
+  mel_fmax: 8000.0
+
+train:
+  name: ${dataset.name}
+  save_dir: null
+  ckpt_iter: max
+  iters_per_ckpt: 100000
+  iters_per_logging: 100
+  n_iters: 1300001
+  learning_rate: 2e-4
+  batch_size_per_gpu: 64
+
+generate:
+  name: ${dataset.name}
+  ckpt_path: null
+  n_samples: 3
+  video_path: null
+  w_video: 2.0
+  w_asr: 0.5
+  asr_start: 230
+  save_dir: outputs
+  lipread_text_dir: null
+
+distributed:
+  dist_backend: nccl
+  dist_url: tcp://localhost:54321

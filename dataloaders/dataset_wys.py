@@ -20,6 +20,8 @@ import torchvision.transforms as transforms
 from .stft import normalise_mel
 import pandas as pd
 
+from .dataset_config import normalize_dataset_name
+
 def files_to_list(data_path, suffix):
     """
     Load all .wav files in data_path
@@ -35,14 +37,18 @@ def load_wav_to_torch(full_path):
     return torch.from_numpy(data).float(), sampling_rate
 
 
-class LipVoicerDataset(torch.utils.data.Dataset):
+class WYSDataset(torch.utils.data.Dataset):
     """
     This is the main class that calculates the spectrogram and returns the
     spectrogram, audio pair.
     """
-    #dataset cfg 가져옴
-    def __init__(self, split, videos_dir, mouthrois_dir, audios_dir,text_dir, sampling_rate, videos_window_size, audio_stft_hop,dataset_root,
-                 pred_text_main_dir=None, pred_text_pretrain_dir=None):
+    def __init__(self, split, name, root, videos_dir, mouthrois_dir, audios_dir,
+                 text_dir, sampling_rate, videos_window_size, audio_stft_hop,
+                 dataset_root, pred_text_main_dir=None, pred_text_pretrain_dir=None):
+        self.dataset_name = normalize_dataset_name(name)
+        self.ds_name = self.dataset_name.upper()
+        self.root = root
+        self.dataset_root = dataset_root
         self.mouthrois_dir = mouthrois_dir
         # When set, text for training samples is read from predicted lip-reading
         # transcripts instead of the ground-truth annotation files. Everything else
@@ -50,8 +56,7 @@ class LipVoicerDataset(torch.utils.data.Dataset):
         self.pred_text_main_dir = pred_text_main_dir
         self.pred_text_pretrain_dir = pred_text_pretrain_dir
         self.use_pred_text = pred_text_main_dir is not None
-        if "LRS3" in videos_dir:
-            self.ds_name = "LRS3"
+        if self.dataset_name == "lrs3":
             split_dir = ['pretrain','trainval'] if split in ['train', 'val'] else ['test']
             self.videos_dir = videos_dir
             self.audios_dir = audios_dir
@@ -67,8 +72,7 @@ class LipVoicerDataset(torch.utils.data.Dataset):
 
 
 
-        elif "LRS2" in videos_dir or "Temped" in videos_dir:
-            self.ds_name = "LRS2"
+        elif self.dataset_name == "lrs2":
             split_dir = ['main']
 
             if split == 'train':
