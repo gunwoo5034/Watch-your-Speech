@@ -15,6 +15,9 @@ exp/
 checkpoints/
 save_dir*/
 generated_mels/
+multirun/
+Samples/
+MOS_sample_codec/
 
 *.ckpt
 *.pkl
@@ -22,3 +25,8 @@ generated_mels/
 *.pth
 *.wav.spec
 *.ipynb
+*.avi
+*.flac
+*.mp3
+*.mp4
+*.wav
